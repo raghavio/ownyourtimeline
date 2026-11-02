@@ -1,0 +1,139 @@
+/* Only successful current-policy decisions may mark a retained native copy. */
+[data-pf-confirmed-filter] { display: none !important; }
+
+/* Filtered archive: an independent scroll layer over the timeline. Visibility
+   (not display) keeps X's measured geometry and scrollbar gutter intact. */
+html[data-pf-filtered-view] {
+  overflow-y: hidden !important;
+  scrollbar-gutter: var(--pf-page-gutter, auto) !important;
+}
+html[data-pf-filtered-view] [data-testid="primaryColumn"] *,
+html[data-pf-filtered-view] [data-testid="primaryColumn"] { visibility: hidden !important; }
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"],
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"] * { visibility: visible !important; }
+
+/* X's selected underline/font often live in React-managed classes, not
+   aria-selected CSS. Suppress that presentation only while the archive is open. */
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"] [role="tab"]:not(#pf-filtered-tab),
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"] [role="tab"]:not(#pf-filtered-tab) * {
+  color: var(--pf-native-muted, #71767b) !important;
+  font-weight: 500 !important;
+}
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"] [role="tab"]:not(#pf-filtered-tab)::after,
+html[data-pf-filtered-view] [data-testid="primaryColumn"] [role="tablist"] [role="tab"]:not(#pf-filtered-tab)::before,
+html[data-pf-filtered-view] [data-pf-native-indicator] { opacity: 0 !important; }
+
+#pf-filtered-tab {
+  appearance: none;
+  position: relative;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  min-width: 0;
+  flex: 1 1 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+#pf-filtered-tab:hover { background-color: color-mix(in srgb, currentColor 7%, transparent); }
+#pf-filtered-tab:focus-visible { outline: 2px solid var(--pf-tab-accent, #1d9bf0); outline-offset: -3px; }
+#pf-filtered-tab .pf-tab-label { position: relative; display: flex; align-items: center; height: 100%; min-height: 1em; white-space: nowrap; }
+#pf-filtered-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--pf-label-width, 56px);
+  min-width: 56px;
+  border-radius: 9999px;
+  background: var(--pf-tab-accent, #1d9bf0);
+  opacity: 0;
+}
+#pf-filtered-tab[aria-selected="true"]::after { opacity: 1; }
+
+#pf-filtered-panel {
+  --pf-card-border: color-mix(in srgb, currentColor 16%, transparent);
+  --pf-card-muted: color-mix(in srgb, currentColor 55%, transparent);
+  position: fixed;
+  bottom: 0;
+  z-index: 10;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+  padding: 0;
+  background: Canvas;
+  color: CanvasText;
+  font-family: var(--pf-card-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-size: var(--pf-card-size, 15px);
+  line-height: var(--pf-card-line, 20px);
+}
+#pf-filtered-panel[hidden] { display: none !important; }
+#pf-filtered-panel * { box-sizing: border-box; }
+#pf-filtered-panel a { color: inherit; text-decoration: none; }
+#pf-filtered-panel a:focus-visible,
+#pf-filtered-panel button:focus-visible { outline: 2px solid #1d9bf0; outline-offset: 2px; }
+#pf-filtered-panel .pf-filtered-empty { padding: 32px; }
+#pf-filtered-panel .pf-filtered-empty h2 { margin: 0 0 8px; font-size: 28px; font-weight: 800; line-height: 1.2; }
+#pf-filtered-panel .pf-filtered-empty p { color: var(--pf-card-muted); margin: 0; }
+#pf-filtered-panel .pf-tweet-card { display: block; min-height: 0; padding: 12px 16px; margin: 0; border-bottom: 1px solid var(--pf-card-border); }
+#pf-filtered-panel .pf-tweet-card:hover { background: color-mix(in srgb, currentColor 2%, transparent); }
+#pf-filtered-panel .pf-card-row { display: flex; align-items: flex-start; gap: 12px; }
+#pf-filtered-panel .pf-card-body { flex: 1; min-width: 0; }
+#pf-filtered-panel .pf-card-avatar {
+  display: flex;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-weight: 700;
+}
+#pf-filtered-panel .pf-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#pf-filtered-panel .pf-card-author { display: flex; align-items: center; gap: 4px; min-width: 0; min-height: 20px; }
+#pf-filtered-panel .pf-card-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#pf-filtered-panel .pf-card-name:hover,
+#pf-filtered-panel .pf-card-date:hover { text-decoration: underline; }
+#pf-filtered-panel .pf-card-handle { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+#pf-filtered-panel .pf-card-handle,
+#pf-filtered-panel .pf-card-date,
+#pf-filtered-panel .pf-card-muted { color: var(--pf-card-muted); }
+#pf-filtered-panel .pf-card-date { white-space: nowrap; }
+#pf-filtered-panel .pf-card-verified { display: inline-flex; color: #1d9bf0; flex-shrink: 0; }
+#pf-filtered-panel .pf-card-verified svg { width: 18px; height: 18px; }
+#pf-filtered-panel .pf-card-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+#pf-filtered-panel .pf-card-text a { color: #1d9bf0; }
+#pf-filtered-panel .pf-card-text a:hover { text-decoration: underline; }
+#pf-filtered-panel .pf-card-context { display: flex; align-items: center; gap: 8px; color: var(--pf-card-muted); font-size: 13px; font-weight: 700; margin: 0 0 4px 28px; }
+#pf-filtered-panel .pf-card-context svg { width: 16px; height: 16px; }
+#pf-filtered-panel .pf-card-media { display: grid; grid-template-columns: 1fr; gap: 2px; border: 1px solid var(--pf-card-border); border-radius: 16px; overflow: hidden; margin-top: 12px; }
+#pf-filtered-panel .pf-card-media:not([data-count="1"]) { grid-template-columns: 1fr 1fr; }
+#pf-filtered-panel .pf-card-media[data-count="3"] .pf-card-media-tile:first-child { grid-row: span 2; }
+#pf-filtered-panel .pf-card-media-tile { position: relative; min-width: 0; overflow: hidden; aspect-ratio: 1.6; background: color-mix(in srgb, currentColor 4%, transparent); }
+#pf-filtered-panel .pf-card-media:not([data-count="1"]) .pf-card-media-tile { aspect-ratio: auto; min-height: 130px; }
+#pf-filtered-panel .pf-card-media-tile > a { display: block; width: 100%; height: 100%; }
+#pf-filtered-panel .pf-card-media img,
+#pf-filtered-panel .pf-card-media video { display: block; width: 100%; height: 100%; object-fit: cover; }
+#pf-filtered-panel .pf-card-media video { object-fit: contain; background: #000; }
+#pf-filtered-panel .pf-card-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 48px; height: 48px; border-radius: 9999px; color: white; background: #1d9bf0; }
+#pf-filtered-panel .pf-card-play svg { width: 28px; height: 28px; }
+#pf-filtered-panel .pf-card-quote { padding: 12px; border: 1px solid var(--pf-card-border); border-radius: 16px; overflow: hidden; margin-top: 12px; }
+#pf-filtered-panel .pf-card-avatar-small { width: 20px; height: 20px; flex-basis: 20px; font-size: 12px; }
+#pf-filtered-panel .pf-card-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; color: var(--pf-card-muted); font-size: 13px; }
+#pf-filtered-panel .pf-card-actions a { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; border-radius: 9999px; }
+#pf-filtered-panel .pf-card-actions svg { width: 18px; height: 18px; flex-shrink: 0; }
+#pf-filtered-panel .pf-card-actions a:hover { color: #1d9bf0; }
+#pf-filtered-panel .pf-card-actions [data-action="like"]:hover { color: #f91880; }
+#pf-filtered-panel .pf-card-actions [data-action="repost"]:hover { color: #00ba7c; }
+@media (max-width: 500px) {
+  #pf-filtered-panel .pf-tweet-card { padding: 12px; }
+  #pf-filtered-panel .pf-card-row { gap: 8px; }
+  #pf-filtered-panel .pf-card-actions { gap: 4px; font-size: 12px; }
+}

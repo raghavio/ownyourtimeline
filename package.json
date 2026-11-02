@@ -1,0 +1,21 @@
+{
+  "name": "ownyourtimeline",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:dev": "node scripts/build.mjs --dev",
+    "check": "tsc --noEmit",
+    "test": "npm run build:dev && node --test tests/*.test.mjs && playwright test",
+    "package": "npm run build && rm -f ownyourtimeline.zip && cd dist && zip -qr ../ownyourtimeline.zip .",
+    "store:assets": "npm run build && node scripts/store-assets.mjs && npm run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/chrome": "^0.1.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.0"
+  }
+}

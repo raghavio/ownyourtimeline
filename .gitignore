@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-dev/
+artifacts/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+ownyourtimeline.zip
