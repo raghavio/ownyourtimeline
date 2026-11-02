@@ -2,26 +2,50 @@
 <html lang="en">
 <head><meta charset="utf-8"><title>OwnYourTimeline</title><link rel="stylesheet" href="popup.css"><script defer src="popup.js"></script></head>
 <body><main>
-<h1>OwnYourTimeline</h1>
-<p id="status" role="status" aria-live="polite">Loading…</p>
+<header>
+  <h1>OwnYourTimeline</h1>
+  <input id="enabled" type="checkbox" role="switch" aria-label="Filtering enabled" title="Pausing or resuming reloads open X Home tabs">
+</header>
 
-<label class="toggle"><input id="enabled" type="checkbox"> Filtering enabled</label>
-<label for="prompt">Feed instruction</label>
-<textarea id="prompt" rows="6" maxlength="2000" placeholder="Nothing political"></textarea>
-<button id="apply">Apply</button>
-<p class="hint">Applying, pausing or resuming reloads open X Home tabs.</p>
-<label><input id="showFilteredTab" type="checkbox"> Show a Filtered tab with hidden posts</label>
+<section id="status" class="card" role="status" aria-live="polite" data-state="off">
+  <div class="summary-row">
+    <p class="summary"><span class="dot" aria-hidden="true"></span><span id="summary">Loading…</span></p>
+    <p id="stats" class="stats" hidden><span><strong id="removed">0</strong> hidden</span><span><strong id="allowed">0</strong> shown</span><span><strong id="unchecked">0</strong> unchecked</span></p>
+  </div>
+  <p id="error" class="error" hidden></p>
+</section>
 
-<label for="key">TypeSafe API key</label>
-<input id="key" type="password" autocomplete="off" placeholder="Enter or replace key">
-<label><input id="remember" type="checkbox"> Remember key on this device</label>
-<div class="row"><button id="saveKey">Save and test key</button><button id="removeKey">Remove key</button></div>
-<p id="keyStatus" class="hint" role="status"></p>
+<section class="card">
+  <label for="prompt" class="label">Feed instruction</label>
+  <div class="editor">
+    <textarea id="prompt" rows="7" maxlength="2000" placeholder="One rule per line, e.g.&#10;No politics&#10;No engagement bait"></textarea>
+    <div class="editor-foot"><span id="applyHint" hidden>Ctrl+Enter to apply · reloads X Home tabs</span><span id="count" aria-hidden="true">0/2000</span></div>
+  </div>
+  <div class="actions spread">
+    <label class="check"><input id="showFilteredTab" type="checkbox"> Show a Filtered tab with hidden posts</label>
+    <button id="apply" class="primary" disabled>Apply</button>
+  </div>
+</section>
 
-<section id="debug" hidden>
-<h2>Debug log</h2>
-<p class="hint">Dev build: every Home response, classifier request and outcome is recorded (latest 500 events). The export contains post text and your instruction, never your key.</p>
-<div class="row"><button id="exportLog">Export log</button><button id="clearLog">Clear log</button></div>
-<p id="debugStatus" class="hint" role="status"></p>
+<section class="card">
+  <div id="keySummary" class="key-summary" hidden>
+    <span class="label">API key</span>
+    <span id="keyState"></span>
+    <span class="links"><button id="changeKey" class="link">Change</button><button id="removeKey" class="link danger">Remove</button></span>
+  </div>
+  <div id="keyForm" hidden>
+    <span class="label">TypeSafe API key</span>
+    <input id="key" type="password" autocomplete="off" placeholder="Paste your key" aria-label="TypeSafe API key">
+    <label class="check"><input id="remember" type="checkbox"> Remember key on this device</label>
+    <div class="actions"><button id="saveKey" class="primary">Save and test key</button><button id="cancelKey" class="link" hidden>Cancel</button></div>
+  </div>
+  <p id="keyStatus" class="hint" role="status"></p>
+</section>
+
+<section id="debug" class="card" hidden>
+  <span class="label">Debug log</span>
+  <p class="hint">Dev build: every Home response, classifier request and outcome is recorded (latest 500 events). The export contains post text and your instruction, never your key.</p>
+  <div class="actions"><button id="exportLog">Export log</button><button id="clearLog">Clear log</button></div>
+  <p id="debugStatus" class="hint" role="status"></p>
 </section>
 </main></body></html>

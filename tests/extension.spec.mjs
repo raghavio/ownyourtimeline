@@ -78,6 +78,60 @@ test('rejected posts are removed from Home responses before X renders them', asy
   expect(await counts()).toEqual({ active: true, removed: 4, allowed: 4, unchecked: 0 });
 });
 
+test('popup re-renders on stored changes without re-laying out', async () => {
+  const { page, configure, popup } = await launch();
+  await configure({});
+  await page.goto('https://x.com/home');
+  await expect(article(page, '1002')).toBeVisible();
+  const view = await popup();
+  // The popup reads the active tab, so X must be in front when it renders.
+  await page.bringToFront();
+  const toggle = view.locator('#showFilteredTab');
+  await toggle.click();
+  await expect(view.locator('#stats')).toBeVisible();
+  await expect(view.locator('#removed')).toHaveText('1');
+  await expect(view.locator('#allowed')).toHaveText('1');
+  // Any hidden toggle mid-render resizes the real popup window (visible jitter).
+  await view.evaluate(() => {
+    window.layoutFlips = 0;
+    // Rewriting the same value still queues a record, so count real changes only:
+    // each record's new value is the next record's oldValue for that element.
+    new MutationObserver(records => records.forEach((record, i) => {
+      const next = records.slice(i + 1).find(later => later.target === record.target);
+      if (record.oldValue !== (next ? next.oldValue : record.target.getAttribute('hidden'))) window.layoutFlips++;
+    })).observe(document.querySelector('main'), { subtree: true, attributeFilter: ['hidden'], attributeOldValue: true });
+  });
+  await toggle.click();
+  await expect(toggle).not.toBeChecked();
+  await view.waitForTimeout(500);
+  expect(await view.evaluate(() => window.layoutFlips)).toBe(0);
+  await expect(view.locator('#removed')).toHaveText('1');
+});
+
+test('instruction editor grows with its text but keeps the popup within Chrome\'s 600px cap', async () => {
+  const { configure, popup } = await launch();
+  const size = view => view.evaluate(() => ({ body: document.body.offsetHeight, editor: document.getElementById('prompt').offsetHeight }));
+
+  await configure({ prompt: 'No politics' });
+  const short = await popup();
+  await expect(short.locator('#summary')).not.toHaveText('Loading…');
+  expect((await size(short)).editor).toBe(160);
+
+  await configure({ prompt: Array.from({ length: 12 }, (_, i) => `Rule ${i}: something long enough to matter`).join('\n') });
+  const medium = await popup();
+  await expect(medium.locator('#summary')).not.toHaveText('Loading…');
+  const mediumSize = await size(medium);
+  // All of it is visible: no inner scrolling.
+  expect(await medium.evaluate(() => { const box = document.getElementById('prompt'); return box.scrollHeight - box.clientHeight; })).toBe(0);
+  expect(mediumSize.editor).toBeGreaterThan(160);
+  expect(mediumSize.body).toBeLessThanOrEqual(600);
+
+  await configure({ prompt: 'A rule that never ends.\n'.repeat(80) });
+  const long = await popup();
+  await expect(long.locator('#summary')).not.toHaveText('Loading…');
+  expect((await size(long)).body).toBe(600);
+});
+
 test('provider failures show posts unfiltered and the popup explains why', async () => {
   const { page, configure, calls, counts, popup } = await launch({ provider: route => route.fulfill({ status: 401, body: '' }) });
   await configure({});
