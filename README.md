@@ -2,6 +2,8 @@
 
 A Chrome/Edge extension (Manifest V3) that filters your X Home feed, both For you and Following, with a plain-language instruction such as "Nothing political". Posts are classified by [TypeSafe](https://typesafe.ai) Jev using your own API key.
 
+![The OwnYourTimeline popup open over X Home, showing hidden and shown post counts and a multi-line feed instruction](docs/popup.png)
+
 ## Install from source
 
 Requires Node.js 22+ and Chrome or Edge 120+.
